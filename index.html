@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OPRET System – Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    :root {
+      --bg: #0d0f12;
+      --panel: #16191f;
+      --panel-light: #1f232b;
+      --text-main: #f5f7ff;
+      --text-sub: #b8bfd8;
+      --accent-blue: #4aa8ff;
+      --accent-blue-soft: rgba(74,168,255,0.25);
+      --border-soft: #2a2f3a;
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: linear-gradient(135deg, #0d0f12, #11141a);
+      color: var(--text-main);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      background: var(--panel);
+      border-radius: 14px;
+      padding: 24px 26px;
+      border: 1px solid var(--border-soft);
+      box-shadow:
+        0 0 40px rgba(0,0,0,0.6),
+        0 0 0 1px rgba(255,255,255,0.03);
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 6px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-bottom: 22px;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-soft);
+      background: var(--panel-light);
+      color: var(--text-main);
+      font-size: 14px;
+      margin-bottom: 16px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 8px var(--accent-blue-soft);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent-blue);
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #6bb8ff;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-sub);
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>OPRET System</h1>
+  <div class="subtitle">Initialize your local profile</div>
+
+  <label for="username">Display Name</label>
+  <input id="username" type="text" placeholder="Enter your name">
+
+  <button onclick="createProfile()">Create Profile</button>
+
+  <div class="footer-note">
+    Your data is stored locally on this device only.
+  </div>
+</div>
+
+<script>
+  // Your secure Owner Key
+  const OWNER_KEY = "OPRET-ROOT-9F2A7C1X";
+
+  function createProfile() {
+    const name = document.getElementById('username').value.trim();
+
+    if (!name) {
+      alert("Please enter a name.");
+      return;
+    }
+
+    // Check if this device already has a tier
+    let existingTier = localStorage.getItem("opret_tier");
+    let storedKey = localStorage.getItem("opret_owner_key");
+
+    // If this device has the Owner Key → Owner Tier
+    if (storedKey === OWNER_KEY) {
+      localStorage.setItem("opret_tier", "owner");
+      localStorage.setItem("opret_username", name);
+      window.location.href = "owner.html";
+      return;
+    }
+
+    // If no tier exists yet, check if this device should become Owner
+    if (!existingTier) {
+      // Ask for Owner Key
+      let entered = prompt("Enter Owner Key (leave blank if you're not the owner):");
+
+      if (entered === OWNER_KEY) {
+        // Correct key → Owner Tier
+        localStorage.setItem("opret_owner_key", OWNER_KEY);
+        localStorage.setItem("opret_tier", "owner");
+        localStorage.setItem("opret_username", name);
+        window.location.href = "owner.html";
+        return;
+      }
+    }
+
+    // Default → Normal Tier
+    localStorage.setItem("opret_tier", "normal");
+    localStorage.setItem("opret_username", name);
+    window.location.href = "normal.html";
+  }
+</script>
+
+</body>
+</html>

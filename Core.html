@@ -1,0 +1,125 @@
+/* ============================================================
+   OPRET SYSTEM CORE — Version 1
+   Handles: profiles, XP, logs, feed, tier logic
+   Works with: index.html, owner.html, normal.html
+   ============================================================ */
+
+console.log("OPRET core.js loaded");
+
+// -------------------------------
+// Load user profile
+// -------------------------------
+function loadUser() {
+  return {
+    name: localStorage.getItem("opret_username") || "Unknown",
+    tier: localStorage.getItem("opret_tier") || "normal",
+    xp: parseInt(localStorage.getItem("opret_xp") || "0"),
+    stats: JSON.parse(localStorage.getItem("opret_stats") || "{}"),
+    logs: JSON.parse(localStorage.getItem("opret_logs") || "[]")
+  };
+}
+
+// -------------------------------
+// Save user profile
+// -------------------------------
+function saveUser(user) {
+  localStorage.setItem("opret_username", user.name);
+  localStorage.setItem("opret_tier", user.tier);
+  localStorage.setItem("opret_xp", user.xp);
+  localStorage.setItem("opret_stats", JSON.stringify(user.stats));
+  localStorage.setItem("opret_logs", JSON.stringify(user.logs));
+}
+
+// -------------------------------
+// Add XP
+// -------------------------------
+function addXP(amount) {
+  let user = loadUser();
+  user.xp += amount;
+
+  addLog(`Gained ${amount} XP`);
+  saveUser(user);
+}
+
+// -------------------------------
+// Add a log entry
+// -------------------------------
+function addLog(text) {
+  let user = loadUser();
+
+  const entry = {
+    text: text,
+    time: new Date().toLocaleString()
+  };
+
+  user.logs.unshift(entry); // newest first
+  saveUser(user);
+}
+
+// -------------------------------
+// Generate a basic feed message
+// -------------------------------
+function generateFeed() {
+  let user = loadUser();
+
+  const messages = [
+    "System check complete.",
+    "No anomalies detected.",
+    "Your profile is stable.",
+    "Background sync successful.",
+    "Local environment verified.",
+    "Activity levels normal."
+  ];
+
+  const msg = messages[Math.floor(Math.random() * messages.length)];
+
+  return `${msg} • XP: ${user.xp}`;
+}
+
+// -------------------------------
+// Initialize Normal UI
+// -------------------------------
+function initNormalUI() {
+  let feedBox = document.getElementById("feedText");
+  if (feedBox) {
+    feedBox.textContent = generateFeed();
+  }
+
+  // Give a little XP each time they open the page
+  addXP(1);
+}
+
+// -------------------------------
+// Initialize Owner UI
+// -------------------------------
+function initOwnerUI() {
+  let list = document.getElementById("userList");
+  if (!list) return;
+
+  // Owner sees only their own profile for now
+  let user = loadUser();
+
+  let row = document.createElement("div");
+  row.className = "user-row";
+  row.innerHTML = `
+    <span>${user.name}</span>
+    <span>Owner</span>
+  `;
+
+  list.appendChild(row);
+}
+
+// -------------------------------
+// Auto-run depending on page
+// -------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  const page = window.location.pathname;
+
+  if (page.includes("normal.html")) {
+    initNormalUI();
+  }
+
+  if (page.includes("owner.html")) {
+    initOwnerUI();
+  }
+});

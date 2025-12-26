@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OPRET – User Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    :root {
+      --bg: #0d0f12;
+      --panel: #16191f;
+      --panel-light: #1f232b;
+      --text-main: #f5f7ff;
+      --text-sub: #b8bfd8;
+      --accent-blue: #4aa8ff;
+      --accent-blue-soft: rgba(74,168,255,0.25);
+      --border-soft: #2a2f3a;
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: linear-gradient(135deg, #0d0f12, #11141a);
+      color: var(--text-main);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      background: var(--panel);
+      border-radius: 14px;
+      border: 1px solid var(--border-soft);
+      padding: 24px;
+      box-shadow:
+        0 0 40px rgba(0,0,0,0.6),
+        0 0 0 1px rgba(255,255,255,0.03);
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: var(--accent-blue);
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-sub);
+      margin-bottom: 10px;
+      margin-top: 20px;
+    }
+
+    .panel-box {
+      background: var(--panel-light);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .logout-btn {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      border-radius: 8px;
+      border: none;
+      background: #ff4d4d;
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: #ff6b6b;
+    }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+  <h1>OPRET User Dashboard</h1>
+  <div class="subtitle">Normal Tier • Standard Access</div>
+
+  <div class="section-title">Your Profile</div>
+  <div class="panel-box">
+    <div><strong>Name:</strong> <span id="userName"></span></div>
+    <div><strong>Tier:</strong> Normal</div>
+    <div><strong>Status:</strong> Active</div>
+  </div>
+
+  <div class="section-title">Your Feed</div>
+  <div class="panel-box">
+    <div id="feedText">Welcome to OPRET. Your feed will appear here.</div>
+  </div>
+
+  <button class="logout-btn" onclick="logout()">Reset This Device</button>
+</div>
+
+<script>
+  // Redirect if not normal tier
+  const tier = localStorage.getItem("opret_tier");
+  if (tier !== "normal") {
+    window.location.href = "index.html";
+  }
+
+  // Load user name
+  document.getElementById("userName").textContent =
+    localStorage.getItem("opret_username") || "Unknown";
+
+  // Reset device
+  function logout() {
+    if (confirm("This will remove your profile from this device. Continue?")) {
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
+  }
+<script src="core.js"></script>
+
+</body>
+</html>
